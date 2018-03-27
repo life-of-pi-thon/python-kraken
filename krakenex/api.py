@@ -18,6 +18,7 @@
 """Kraken.com cryptocurrency Exchange API."""
 
 import requests
+from kraken_config import settings
 
 # private query nonce
 import time
@@ -27,7 +28,7 @@ import urllib.parse
 import hashlib
 import hmac
 import base64
-
+from kraken_config import settings
 from . import version
 
 class API(object):
@@ -47,7 +48,7 @@ class API(object):
        No query rate limiting is performed.
 
     """
-    def __init__(self, key='', secret=''):
+    def __init__(self):
         """ Create an object with authentication information.
 
         :param key: (optional) key identifier for queries to the API
@@ -57,8 +58,8 @@ class API(object):
         :returns: None
 
         """
-        self.key = key
-        self.secret = secret
+        self.key = settings.key
+        self.secret = settings.secret
         self.uri = 'https://api.kraken.com'
         self.apiversion = '0'
         self.session = requests.Session()
@@ -98,9 +99,9 @@ class API(object):
         :returns: None
 
         """
-        with open(path, 'r') as f:
-            self.key = f.readline().strip()
-            self.secret = f.readline().strip()
+        #with open(path, 'r') as f:
+        self.key = settings.key
+        self.secret = settings.secret
         return
 
     def _query(self, urlpath, data, headers=None, timeout=None):
@@ -220,3 +221,24 @@ class API(object):
         sigdigest = base64.b64encode(signature.digest())
 
         return sigdigest.decode()
+
+    def get_market_tickers(self):
+        all_pairs = self.query_public('AssetPairs')
+        all_pairs_keys = ','.join(all_pairs['result'].keys())
+        print(all_pairs_keys)
+        market_books = {}
+        ret = self.query_public('Ticker', data={'pair': all_pairs_keys})
+        for symbol, value in ret['result'].items():
+            asks = value['a']
+            bids = value['b']
+            #regexp replace required here for standardisation
+            market_books[symbol
+                .replace('XX','X')
+                .replace('ZZ', 'Z')
+                .replace('.d','')
+                .replace('ZUSD', 'USD')
+                .replace('XE', 'X')] = {'askPrice': float(asks[0]),
+                                                                         'askQty': float(asks[1]),
+                                                                         'bidPrice': float(bids[0]),
+                                                                         'bidQty': float(bids[1])}
+        return market_books
