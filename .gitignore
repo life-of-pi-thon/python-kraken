@@ -46,3 +46,4 @@ nosetests.xml
 *.secret
 *.pickle
 kraken_config/settings.py
+kraken_config/settings.py

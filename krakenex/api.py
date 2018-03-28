@@ -233,11 +233,24 @@ class API(object):
             bids = value['b']
             #regexp replace required here for standardisation
             market_books[symbol
-                .replace('XX','X')
+                .replace('XX', 'X')
                 .replace('ZZ', 'Z')
-                .replace('.d','')
+                .replace('.d', '')
                 .replace('ZUSD', 'USD')
-                .replace('XE', 'X')] = {'askPrice': float(asks[0]),
+                .replace('XE', 'E')
+                .replace('XETH', 'ETH')
+                .replace('ZEUR', 'EUR')
+                .replace('XREP', 'REP')
+                .replace('ZGBP', 'GBP')
+                .replace('XMLN', 'MLN')
+                .replace('XICN', 'ICN')
+                .replace('ZCAD', 'CAD')
+                .replace('XETC', 'ETC')
+                .replace('ZJPY', 'JPY')
+                .replace('XLTC', 'LTC')
+                .replace('XZEC', 'ZEC')
+                #TODO find a way of changing back before making bet
+                .replace('XBT', 'BTC')] = {'askPrice': float(asks[0]),
                                                                          'askQty': float(asks[1]),
                                                                          'bidPrice': float(bids[0]),
                                                                          'bidQty': float(bids[1])}
